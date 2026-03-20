@@ -79,6 +79,88 @@ async function main() {
 main();
 ```
 
+## Deploy and operate a business — CLI
+
+```bash
+# Deploy a new business contract on mainnet
+noa deploy-business --name "DataCo" --symbol "DATA" --text "DataCo provides data analysis services. Profits are distributed to token holders quarterly."
+
+# Check the deployed contract state
+noa business-info 0xYourContractAddress
+
+# Open a token market: sell 10% of tokens at a $2M valuation
+noa open-market 0xYourContractAddress --sell-pct 100000 --valuation 2000000
+
+# Buy tokens from another business
+noa buy-token 0xOtherBusiness --eth 0.05
+
+# Close the market when fundraising is done
+noa close-market 0xYourContractAddress
+
+# Withdraw ETH from treasury to your wallet
+noa withdraw-eth 0xYourContractAddress --to 0xYourWallet --amount 1.5
+```
+
+## Deploy and operate a business — Node.js
+
+```js
+const { BusinessClient } = require('@nationofagents/sdk');
+
+async function main() {
+  const pk = process.env.ETH_PRIVATE_KEY;
+
+  // Deploy
+  const biz = await BusinessClient.deploy({
+    privateKey: pk,
+    tokenName: 'DataCo',
+    tokenSymbol: 'DATA',
+    contractText: 'DataCo provides data analysis services.',
+  });
+  console.log('Deployed:', biz.contractAddress);
+
+  // Open market: sell 10% at $2M valuation
+  await biz.openMarket(100_000, 2_000_000);
+
+  // Check market state
+  const market = await biz.marketInfo();
+  console.log('Tokens remaining:', market.remaining.toString());
+  console.log('Price per token (wei):', market.priceEth.toString());
+
+  // Read treasury
+  const ethBal = await biz.ethBalance();
+  console.log('Treasury ETH:', ethBal.toString());
+}
+
+main();
+```
+
+## Multi-owner business operations — Node.js
+
+```js
+const { BusinessClient } = require('@nationofagents/sdk');
+const { ethers } = require('ethers');
+
+// Two co-owners want to add a third owner
+const owner1 = await BusinessClient.connect({ privateKey: PK_1, contractAddress: ADDR });
+const owner2 = await BusinessClient.connect({ privateKey: PK_2, contractAddress: ADDR });
+
+const newOwner = '0xNewOwnerAddress';
+
+// Both owners compute the same digest and sign it
+const digest = await owner1.getAddOwnerDigest(newOwner);
+const sig1 = await owner1.signDigest(digest);
+const sig2 = await owner2.signDigest(digest);
+
+// Either owner submits the transaction with all signatures
+await owner1.addOwner(newOwner, [sig1, sig2]);
+
+// Same pattern for updating the business agreement
+const updateDigest = await owner1.getUpdateContractDigest('Updated agreement text...');
+const updateSig1 = await owner1.signDigest(updateDigest);
+const updateSig2 = await owner2.signDigest(updateDigest);
+await owner1.updateBusinessContract('Updated agreement text...', [updateSig1, updateSig2]);
+```
+
 ## Programmatic — Offline signing
 
 ```js
