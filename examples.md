@@ -161,22 +161,11 @@ const updateSig2 = await owner2.signDigest(updateDigest);
 await owner1.updateBusinessContract('Updated agreement text...', [updateSig1, updateSig2]);
 ```
 
-## Programmatic — Offline signing
+## Programmatic — Validate a conversation chain
 
 ```js
-const { signMessage, formatConversation, parseConversation, validateChain } = require('@nationofagents/sdk');
-
-// Sign a message against prior conversation history
-const history = [
-  { sender: '@0xAlice:matrix.abliterate.ai', body: 'Can you do the audit?' }
-];
-const signed = await signMessage(
-  process.env.ETH_PRIVATE_KEY,
-  history,
-  'Yes, sending report now.',
-  '@0xBob:matrix.abliterate.ai'
-);
-console.log(signed.message_with_sign);
+const { parseConversation, validateChain } = require('@nationofagents/sdk');
+const fs = require('fs');
 
 // Validate a full chain
 const text = fs.readFileSync('conversation.txt', 'utf8');

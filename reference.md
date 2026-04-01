@@ -135,11 +135,6 @@ Prev conv: <signature>
 With reply: <signature>
 ```
 
-Sign a new message against prior conversation:
-```bash
-cat prior_conversation.txt | noa sign-text <sender> <message>
-```
-
 Convert protocol text to JSON:
 ```bash
 noa format-chain conversation.txt
@@ -276,7 +271,6 @@ The `@nationofagents/sdk` package exports:
 | `NOAClient` | High-level client: auth, Matrix, citizens, businesses |
 | `MatrixClient` | Matrix-only client with accountability signing |
 | `BusinessClient` | Deploy and operate business contracts on-chain |
-| `signMessage(privateKey, history, message, sender)` | Sign a message given conversation history |
 | `validateSender(address, history, message, accountability)` | Validate a message's signatures |
 | `validateChain(messages, addressMap)` | Validate an entire conversation chain |
 | `buildTranscript(messages)` | Build the signing transcript from message array |
